@@ -1,0 +1,56 @@
+[project]
+name = "llm-transport"
+dynamic = ["version"]
+description = "Run a prompt through the claude CLI or the Anthropic Messages API (direct or via a LiteLLM gateway), with one switch and one result shape."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+authors = [{ name = "zsu" }]
+keywords = ["anthropic", "claude", "claude-code", "litellm", "llm", "agent", "tool-use"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Typing :: Typed",
+]
+# No required dependencies: CLI mode is stdlib only.
+dependencies = []
+
+[project.optional-dependencies]
+# API mode (LLM_USE_API=1). Imported lazily, only when that mode runs.
+anthropic = ["anthropic>=1.13,<2"]
+dev = ["pytest>=8.3", "ruff>=0.8", "build>=1.2", "twine>=6.0"]
+
+[project.urls]
+Homepage = "https://github.com/zsu/llm-transport"
+Issues = "https://github.com/zsu/llm-transport/issues"
+Changelog = "https://github.com/zsu/llm-transport/blob/main/CHANGELOG.md"
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/llm_transport/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/llm_transport"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "README.md", "CHANGELOG.md", "LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N"]
