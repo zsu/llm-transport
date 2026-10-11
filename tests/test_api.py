@@ -300,8 +300,13 @@ def test_spend_cap_stops_the_loop(tmp_path):
     assert env["total_cost_usd"] == pytest.approx(4.0)  # $4 / MTok input
 
 
-def test_timeout_stops_the_loop(tmp_path):
-    env = run_api("p", cwd=tmp_path, allowed_tools="Glob", timeout_s=1e-9, config=CFG,
+def test_timeout_stops_the_loop(tmp_path, monkeypatch):
+    # A scripted clock: Windows' monotonic() ticks every ~15 ms, so a real
+    # sub-tick timeout can read as zero time elapsed.
+    calls = []
+    monkeypatch.setattr(llm_transport.api.time, "monotonic",
+                        lambda: calls.append(1) or (0.0 if len(calls) == 1 else 100.0))
+    env = run_api("p", cwd=tmp_path, allowed_tools="Glob", timeout_s=10, config=CFG,
                   client=FakeClient(text("never")))
     assert env["is_error"] and "timed out" in env["result"]
 
